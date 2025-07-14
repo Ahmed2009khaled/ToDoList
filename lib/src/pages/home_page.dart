@@ -54,7 +54,8 @@ void _refreshTasks() {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: const Text(
-          'My Tasks',
+          'My Tasks '
+          ,
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,

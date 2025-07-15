@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  final Box tasksBox = Hive.box('Tasks');
+  final Box tasksBox = Hive.box('tasks');
   List<Map<String, dynamic>> tasks = [];
 
   @override
@@ -28,22 +28,31 @@ class HomePageState extends State<HomePage> {
       return Map<String, dynamic>.from(item as Map);
     }).toList();
 
-    // --- ADD THIS SORTING LOGIC ---
-    // This sorts the list based on the 'date' string.
-    // It places tasks with no date at the end of the list.
-    refreshedTasks.sort((a, b) {
-      final dateA = a['date'] as String? ?? '';
-      final dateB = b['date'] as String? ?? '';
+refreshedTasks.sort((a, b) {
+  final dateA = a['date'] as String? ?? '';
+  final dateB = b['date'] as String? ?? '';
 
-      if (dateA.isEmpty) return 1; // Pushes tasks without a date to the end
-      if (dateB.isEmpty) return -1; // Keeps tasks with a date at the front
+  // 1. ضع المهام بدون تاريخ في النهاية
+  if (dateA.isEmpty && dateB.isNotEmpty) return 1;
+  if (dateA.isNotEmpty && dateB.isEmpty) return -1;
 
-      return dateA.compareTo(dateB); // Sorts chronologically
-    });
-    // --- END OF SORTING LOGIC ---
+  // 2. إذا كانت التواريخ مختلفة (وكلاهما موجود)، قم بالترتيب حسب التاريخ
+  if (dateA.isNotEmpty && dateB.isNotEmpty) {
+    final dateComparison = dateA.compareTo(dateB);
+    if (dateComparison != 0) {
+      return dateComparison;
+    }
+  }
+
+  // 3. إذا كانت التواريخ متساوية (أو كلاهما فارغ)، استخدم وقت الإنشاء كمعيار ثانوي
+  final createdAtA = a['createdAt'] as String? ?? '';
+  final createdAtB = b['createdAt'] as String? ?? '';
+  return createdAtA.compareTo(createdAtB); // يضمن ترتيبًا ثابتًا
+});
 
     setState(() {
       tasks = refreshedTasks;
+      tasksBox.put('myTasks', tasks);
     });
   }
 
@@ -74,6 +83,7 @@ class HomePageState extends State<HomePage> {
                 itemBuilder: (context, i) {
                   final task = tasks[i];
                   return TaskTile(
+                    key: ValueKey(task),
                     name: task['name'],
                     description: task['descr'],
                     date: task['date'],
@@ -82,7 +92,7 @@ class HomePageState extends State<HomePage> {
                           .push(
                             MaterialPageRoute(
                               builder: (context) =>
-                                  EditTask(task: task, taskIndex: i),
+                                  EditTask(task: task, taskIndex: i, done: false,),
                             ),
                           )
                           .then((_) => _refreshTasks());

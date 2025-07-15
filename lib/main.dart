@@ -9,7 +9,7 @@ import 'package:to_do_list_app/src/pages/home_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  await Hive.openBox('Tasks');
+  await Hive.openBox('tasks');
   await Hive.openBox('done_tasks');
   runApp(const MyApp());
 }
@@ -21,9 +21,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'To Do List',
-      home: HomePage(),
+      initialRoute: '/',
       routes: {
-        'home': (context) => HomePage(),
+        '/': (context) => HomePage(),
         'add_task': (context) => AddTask(),
         'done_tasks': (context) => DoneTasksPage()
       },

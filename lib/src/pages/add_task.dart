@@ -39,6 +39,7 @@ class AddTaskState extends State<AddTask> {
       'name': widget.titleController.text,
       'descr': widget.descriptionController.text,
       'date': widget.dateController.text,
+      'createdAt': DateTime.now().toIso8601String(),
     });
 
     tasksBox.put('myTasks', updatedList);

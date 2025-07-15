@@ -5,10 +5,13 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 /// A page for adding a new task to the Hive database.
 class EditTask extends StatefulWidget {
+
+  final bool? done;
+
   final Map<String, dynamic> task; // لاستقبال بيانات المهمة
   final int taskIndex; // لاستقبال موقع المهمة
 
-  const EditTask({super.key, required this.task, required this.taskIndex});
+  const EditTask({super.key, required this.task, required this.taskIndex, required this.done});
 
   @override
   EditTaskState createState() => EditTaskState();
@@ -21,10 +24,13 @@ class EditTaskState extends State<EditTask> {
 
   GlobalKey<FormState> titleState = GlobalKey();
 
-  final Box tasksBox = Hive.box('Tasks');
+  late final Box tasksBox;
+
   @override
   void initState() {
     super.initState();
+    tasksBox = widget.done! ? Hive.box('done_tasks') : Hive.box('Tasks');
+    
     titleController = TextEditingController(text: widget.task['name']);
     descriptionController = TextEditingController(text: widget.task['descr']);
     dateController = TextEditingController(text: widget.task['date']);

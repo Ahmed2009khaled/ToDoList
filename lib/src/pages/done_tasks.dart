@@ -28,22 +28,18 @@ class DoneTasksPageState extends State<DoneTasksPage> {
       return Map<String, dynamic>.from(item as Map);
     }).toList();
 
-    // --- ADD THIS SORTING LOGIC ---
-    // This sorts the list based on the 'date' string.
-    // It places tasks with no date at the end of the list.
-    refreshedTasks.sort((a, b) {
-      final dateA = a['date'] as String? ?? '';
-      final dateB = b['date'] as String? ?? '';
+refreshedTasks.sort((a, b) {
+    // تأكد من وجود الحقل لتجنب الأخطاء
+    final completedAtA = a['completedAt'] as String? ?? '';
+    final completedAtB = b['completedAt'] as String? ?? '';
 
-      if (dateA.isEmpty) return 1; // Pushes tasks without a date to the end
-      if (dateB.isEmpty) return -1; // Keeps tasks with a date at the front
-
-      return dateA.compareTo(dateB); // Sorts chronologically
-    });
-    // --- END OF SORTING LOGIC ---
+    // b.compareTo(a) للترتيب التنازلي (الأحدث في الأعلى)
+    return completedAtA.compareTo(completedAtB);
+  });
 
     setState(() {
       doneTasks = refreshedTasks;
+      doneTasksBox.put('myTasks', doneTasks);
     });
   }
 
@@ -60,7 +56,7 @@ class DoneTasksPageState extends State<DoneTasksPage> {
         centerTitle: true,
         leading: IconButton(
           onPressed: () {
-            Navigator.of(context).pushReplacementNamed('home');
+            Navigator.of(context).pushReplacementNamed('/');
           },
           icon: Icon(Icons.list_alt_sharp),
         ),
@@ -74,6 +70,7 @@ class DoneTasksPageState extends State<DoneTasksPage> {
                 itemBuilder: (context, i) {
                   final task = doneTasks[i];
                   return TaskTile(
+                    key: ValueKey(task),
                     name: task['name'],
                     description: task['descr'],
                     date: task['date'],
@@ -82,7 +79,7 @@ class DoneTasksPageState extends State<DoneTasksPage> {
                           .push(
                             MaterialPageRoute(
                               builder: (context) =>
-                                  EditTask(task: task, taskIndex: i),
+                                  EditTask(task: task, taskIndex: i, done: true,),
                             ),
                           )
                           .then((_) => _refreshTasks());

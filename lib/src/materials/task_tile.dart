@@ -26,7 +26,7 @@ class _TaskTileState extends State<TaskTile> {
   Widget build(BuildContext context) {
     return Card(
       color: Colors.white,
-      elevation: 10,
+      elevation: 8,
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
         onTap: widget.onTap,

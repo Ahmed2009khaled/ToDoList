@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:to_do_list_app/src/pages/add_task.dart';
+import 'package:to_do_list_app/src/pages/done_tasks.dart';
 // import 'package:to_do_list_app/src/pages/edit_task.dart';
 import 'package:to_do_list_app/src/pages/home_page.dart';
 
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
       routes: {
         'home': (context) => HomePage(),
         'add_task': (context) => AddTask(),
-        // 'edit_task': (context) => EditTask(task: {}, taskIndex: 0),
+        'done_tasks': (context) => DoneTasksPage()
       },
     );
   }

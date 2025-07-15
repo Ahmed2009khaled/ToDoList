@@ -28,14 +28,14 @@ class DoneTasksPageState extends State<DoneTasksPage> {
       return Map<String, dynamic>.from(item as Map);
     }).toList();
 
-refreshedTasks.sort((a, b) {
-    // تأكد من وجود الحقل لتجنب الأخطاء
-    final completedAtA = a['completedAt'] as String? ?? '';
-    final completedAtB = b['completedAt'] as String? ?? '';
+    refreshedTasks.sort((a, b) {
+      // تأكد من وجود الحقل لتجنب الأخطاء
+      final completedAtA = a['completedAt'] as String? ?? '';
+      final completedAtB = b['completedAt'] as String? ?? '';
 
-    // b.compareTo(a) للترتيب التنازلي (الأحدث في الأعلى)
-    return completedAtA.compareTo(completedAtB);
-  });
+      // b.compareTo(a) للترتيب التنازلي (الأحدث في الأعلى)
+      return completedAtA.compareTo(completedAtB);
+    });
 
     setState(() {
       doneTasks = refreshedTasks;
@@ -78,8 +78,11 @@ refreshedTasks.sort((a, b) {
                       Navigator.of(context)
                           .push(
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  EditTask(task: task, taskIndex: i, done: true,),
+                              builder: (context) => EditTask(
+                                task: task,
+                                taskIndex: i,
+                                done: true,
+                              ),
                             ),
                           )
                           .then((_) => _refreshTasks());

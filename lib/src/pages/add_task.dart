@@ -15,7 +15,6 @@ class AddTask extends StatefulWidget {
 }
 
 class AddTaskState extends State<AddTask> {
-
   GlobalKey<FormState> titleState = GlobalKey();
 
   final Box tasksBox = Hive.box('Tasks');
@@ -84,12 +83,11 @@ class AddTaskState extends State<AddTask> {
                         filled: true,
                       ),
                       validator: (value) {
-                        if (value!.isEmpty){
+                        if (value!.isEmpty) {
                           return "Title Cant Be Empty";
                         }
                         return null;
                       },
-                      
                     ),
                   ),
                   const SizedBox(height: 25),
@@ -181,8 +179,8 @@ class AddTaskState extends State<AddTask> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    onPressed: (){
-                      if (titleState.currentState!.validate()){
+                    onPressed: () {
+                      if (titleState.currentState!.validate()) {
                         saveTask();
                       }
                     },

@@ -28,27 +28,27 @@ class HomePageState extends State<HomePage> {
       return Map<String, dynamic>.from(item as Map);
     }).toList();
 
-refreshedTasks.sort((a, b) {
-  final dateA = a['date'] as String? ?? '';
-  final dateB = b['date'] as String? ?? '';
+    refreshedTasks.sort((a, b) {
+      final dateA = a['date'] as String? ?? '';
+      final dateB = b['date'] as String? ?? '';
 
-  // 1. ضع المهام بدون تاريخ في النهاية
-  if (dateA.isEmpty && dateB.isNotEmpty) return 1;
-  if (dateA.isNotEmpty && dateB.isEmpty) return -1;
+      // 1. ضع المهام بدون تاريخ في النهاية
+      if (dateA.isEmpty && dateB.isNotEmpty) return 1;
+      if (dateA.isNotEmpty && dateB.isEmpty) return -1;
 
-  // 2. إذا كانت التواريخ مختلفة (وكلاهما موجود)، قم بالترتيب حسب التاريخ
-  if (dateA.isNotEmpty && dateB.isNotEmpty) {
-    final dateComparison = dateA.compareTo(dateB);
-    if (dateComparison != 0) {
-      return dateComparison;
-    }
-  }
+      // 2. إذا كانت التواريخ مختلفة (وكلاهما موجود)، قم بالترتيب حسب التاريخ
+      if (dateA.isNotEmpty && dateB.isNotEmpty) {
+        final dateComparison = dateA.compareTo(dateB);
+        if (dateComparison != 0) {
+          return dateComparison;
+        }
+      }
 
-  // 3. إذا كانت التواريخ متساوية (أو كلاهما فارغ)، استخدم وقت الإنشاء كمعيار ثانوي
-  final createdAtA = a['createdAt'] as String? ?? '';
-  final createdAtB = b['createdAt'] as String? ?? '';
-  return createdAtA.compareTo(createdAtB); // يضمن ترتيبًا ثابتًا
-});
+      // 3. إذا كانت التواريخ متساوية (أو كلاهما فارغ)، استخدم وقت الإنشاء كمعيار ثانوي
+      final createdAtA = a['createdAt'] as String? ?? '';
+      final createdAtB = b['createdAt'] as String? ?? '';
+      return createdAtA.compareTo(createdAtB); // يضمن ترتيبًا ثابتًا
+    });
 
     setState(() {
       tasks = refreshedTasks;
@@ -91,8 +91,11 @@ refreshedTasks.sort((a, b) {
                       Navigator.of(context)
                           .push(
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  EditTask(task: task, taskIndex: i, done: false,),
+                              builder: (context) => EditTask(
+                                task: task,
+                                taskIndex: i,
+                                done: false,
+                              ),
                             ),
                           )
                           .then((_) => _refreshTasks());

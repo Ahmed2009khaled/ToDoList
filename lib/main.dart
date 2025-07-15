@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => HomePage(),
         'add_task': (context) => AddTask(),
-        'done_tasks': (context) => DoneTasksPage()
+        'done_tasks': (context) => DoneTasksPage(),
       },
     );
   }

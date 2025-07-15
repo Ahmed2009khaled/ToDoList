@@ -78,13 +78,12 @@ class _TaskTileState extends State<TaskTile>
       final taskToMove = sourceList.elementAt(widget.taskIndex);
       sourceList.removeAt(widget.taskIndex);
 
-    if (!widget.done!) {
-      // أضف وقت الإكمال الآن
-      taskToMove['completedAt'] = DateTime.now().toIso8601String();
-    } else {
-        
-      taskToMove['createdAt'] = DateTime.now().toIso8601String(); 
-    }
+      if (!widget.done!) {
+        // أضف وقت الإكمال الآن
+        taskToMove['completedAt'] = DateTime.now().toIso8601String();
+      } else {
+        taskToMove['createdAt'] = DateTime.now().toIso8601String();
+      }
 
       // 2. إضافة المهمة التي تم إزالتها إلى القائمة الهدف
       destinationList.add(taskToMove);

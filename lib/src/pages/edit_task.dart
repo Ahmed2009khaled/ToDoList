@@ -25,10 +25,15 @@ class EditTaskState extends State<EditTask> {
   late TextEditingController titleController;
   late TextEditingController descriptionController;
   late TextEditingController dateController;
+  late TextEditingController timeController;
 
   GlobalKey<FormState> titleState = GlobalKey();
 
   late final Box tasksBox;
+
+  late bool dateSelected = widget.task['time'] != "";
+
+  final Box settings = Hive.box('settings');
 
   @override
   void initState() {
@@ -38,6 +43,7 @@ class EditTaskState extends State<EditTask> {
     titleController = TextEditingController(text: widget.task['name']);
     descriptionController = TextEditingController(text: widget.task['descr']);
     dateController = TextEditingController(text: widget.task['date']);
+    timeController = TextEditingController(text: widget.task['time']);
   }
 
   @override
@@ -58,6 +64,7 @@ class EditTaskState extends State<EditTask> {
       'name': titleController.text,
       'descr': descriptionController.text,
       'date': dateController.text,
+      'time': timeController.text,
     };
 
     tasksBox.put('myTasks', updatedList);
@@ -105,7 +112,6 @@ class EditTaskState extends State<EditTask> {
                       keyboardType: TextInputType.name,
                       controller: titleController,
                       decoration: InputDecoration(
-                        fillColor: Colors.lightBlueAccent[1],
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
@@ -131,7 +137,6 @@ class EditTaskState extends State<EditTask> {
                     controller: descriptionController,
                     maxLines: 5,
                     decoration: InputDecoration(
-                      fillColor: Colors.lightBlueAccent[1],
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -150,7 +155,6 @@ class EditTaskState extends State<EditTask> {
                     controller: dateController,
                     readOnly: true,
                     decoration: InputDecoration(
-                      fillColor: Colors.lightBlueAccent[1],
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -175,6 +179,36 @@ class EditTaskState extends State<EditTask> {
                       filled: true,
                     ),
                   ),
+                  dateSelected
+                      ? TextField(
+                          controller: timeController,
+                          readOnly: true,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.date_range_outlined),
+                              onPressed: () async {
+                                DateTime? dateTimePicker =
+                                    await showOmniDateTimePicker(
+                                      context: context,
+                                      type: OmniDateTimePickerType.time,
+                                    );
+                                if (dateTimePicker != null) {
+                                  setState(() {
+                                    timeController.text =
+                                        "${dateTimePicker.hour.toString().padLeft(2, '0')}:${dateTimePicker.minute.toString().padLeft(2, '0')}";
+                                  });
+                                }
+                              },
+                            ),
+                            hintText: "Select Time",
+                            filled: true,
+                          ),
+                        )
+                      : SizedBox(),
                 ],
               ),
             ),
@@ -183,8 +217,6 @@ class EditTaskState extends State<EditTask> {
               children: [
                 Expanded(
                   child: MaterialButton(
-                    color: Colors.red,
-
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -192,12 +224,15 @@ class EditTaskState extends State<EditTask> {
                     onPressed: () {
                       deleteTask();
                     },
+                    color: settings.get('dark_mode')
+                        ? Colors.red[300]
+                        : Colors.red,
+
                     child: const Text(
                       'Delete',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -205,11 +240,14 @@ class EditTaskState extends State<EditTask> {
                 SizedBox(width: 25),
                 Expanded(
                   child: MaterialButton(
-                    color: Colors.blue,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
+                    color: settings.get('dark_mode')
+                        ? Colors.blue[300]
+                        : Colors.blue,
+
                     onPressed: () {
                       if (titleState.currentState!.validate()) {
                         updateTask();
@@ -220,7 +258,6 @@ class EditTaskState extends State<EditTask> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
                       ),
                     ),
                   ),

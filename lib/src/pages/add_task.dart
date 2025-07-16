@@ -8,6 +8,7 @@ class AddTask extends StatefulWidget {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
+  final TextEditingController timeController = TextEditingController();
   AddTask({super.key});
 
   @override
@@ -18,6 +19,10 @@ class AddTaskState extends State<AddTask> {
   GlobalKey<FormState> titleState = GlobalKey();
 
   final Box tasksBox = Hive.box('Tasks');
+
+  bool dateSelected = false;
+
+  final Box settings = Hive.box('settings');
 
   @override
   void dispose() {
@@ -38,6 +43,7 @@ class AddTaskState extends State<AddTask> {
       'name': widget.titleController.text,
       'descr': widget.descriptionController.text,
       'date': widget.dateController.text,
+      'time': widget.timeController.text,
       'createdAt': DateTime.now().toIso8601String(),
     });
 
@@ -74,7 +80,6 @@ class AddTaskState extends State<AddTask> {
                       keyboardType: TextInputType.name,
                       controller: widget.titleController,
                       decoration: InputDecoration(
-                        fillColor: Colors.lightBlueAccent[1],
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
@@ -100,7 +105,6 @@ class AddTaskState extends State<AddTask> {
                     controller: widget.descriptionController,
                     maxLines: 5,
                     decoration: InputDecoration(
-                      fillColor: Colors.lightBlueAccent[1],
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -119,7 +123,6 @@ class AddTaskState extends State<AddTask> {
                     controller: widget.dateController,
                     readOnly: true,
                     decoration: InputDecoration(
-                      fillColor: Colors.lightBlueAccent[1],
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -134,6 +137,7 @@ class AddTaskState extends State<AddTask> {
                               );
                           if (dateTimePicker != null) {
                             setState(() {
+                              dateSelected = true;
                               widget.dateController.text =
                                   "${dateTimePicker.year}-${dateTimePicker.month.toString().padLeft(2, '0')}-${dateTimePicker.day.toString().padLeft(2, '0')}";
                             });
@@ -144,6 +148,49 @@ class AddTaskState extends State<AddTask> {
                       filled: true,
                     ),
                   ),
+                  SizedBox(height: 25),
+                  dateSelected
+                      ? const Text(
+                          " Due Time",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        )
+                      : SizedBox(),
+
+                  const SizedBox(height: 8),
+
+                  dateSelected
+                      ? TextField(
+                          controller: widget.timeController,
+                          readOnly: true,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.date_range_outlined),
+                              onPressed: () async {
+                                DateTime? dateTimePicker =
+                                    await showOmniDateTimePicker(
+                                      context: context,
+                                      type: OmniDateTimePickerType.time,
+                                    );
+                                if (dateTimePicker != null) {
+                                  setState(() {
+                                    widget.timeController.text =
+                                        "${dateTimePicker.hour.toString().padLeft(2, '0')}:${dateTimePicker.minute.toString().padLeft(2, '0')}";
+                                  });
+                                }
+                              },
+                            ),
+                            hintText: "Select Time",
+                            filled: true,
+                          ),
+                        )
+                      : SizedBox(),
                 ],
               ),
             ),
@@ -152,7 +199,6 @@ class AddTaskState extends State<AddTask> {
               children: [
                 Expanded(
                   child: MaterialButton(
-                    color: Colors.red,
 
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
@@ -161,12 +207,12 @@ class AddTaskState extends State<AddTask> {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
+                    color: settings.get('dark_mode')? Colors.red[300] : Colors.red,
                     child: const Text(
                       'Cancel',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -174,11 +220,13 @@ class AddTaskState extends State<AddTask> {
                 SizedBox(width: 25),
                 Expanded(
                   child: MaterialButton(
-                    color: Colors.blue,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
+                    color: settings.get('dark_mode')
+                        ? Colors.blue[300]
+                        : Colors.blue,
                     onPressed: () {
                       if (titleState.currentState!.validate()) {
                         saveTask();
@@ -189,7 +237,7 @@ class AddTaskState extends State<AddTask> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        
                       ),
                     ),
                   ),

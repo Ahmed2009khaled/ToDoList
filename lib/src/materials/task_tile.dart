@@ -7,6 +7,7 @@ class TaskTile extends StatefulWidget {
   final String? name;
   final String? description;
   final String? date;
+  final String? time;
   final VoidCallback? onTap;
   bool? done;
   final int taskIndex;
@@ -19,6 +20,7 @@ class TaskTile extends StatefulWidget {
     this.date,
     this.onTap,
     this.done,
+    this.time,
     required this.taskIndex,
     required this.onStatusChanged,
   });
@@ -111,13 +113,10 @@ class _TaskTileState extends State<TaskTile>
       child: SlideTransition(
         position: _slideAnimation,
         child: Card(
-          color: Colors.white,
           elevation: 8,
           margin: const EdgeInsets.symmetric(vertical: 8.0),
           child: ListTile(
             onTap: widget.onTap,
-            iconColor: Colors.grey,
-            textColor: Colors.black,
             title: Text(
               widget.name ?? '',
               style: TextStyle(
@@ -145,7 +144,21 @@ class _TaskTileState extends State<TaskTile>
                 toggleTaskStatus();
               },
             ),
-            trailing: widget.date != null ? Text(widget.date!) : null,
+
+            trailing: (widget.date != null && widget.date!.isNotEmpty)
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(widget.date!),
+                      if (widget.time != null && widget.time!.isNotEmpty)
+                        Text(
+                          widget.time!,
+                          style: TextStyle(fontSize: 12),
+                        ),
+                    ],
+                  )
+                : null,
           ),
         ),
       ),

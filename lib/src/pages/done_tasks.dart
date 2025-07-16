@@ -46,9 +46,7 @@ class DoneTasksPageState extends State<DoneTasksPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
         title: const Text(
           'Completed Tasks',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -60,6 +58,15 @@ class DoneTasksPageState extends State<DoneTasksPage> {
           },
           icon: Icon(Icons.list_alt_sharp),
         ),
+        actions: [
+          IconButton(icon: Icon(Icons.cleaning_services_outlined), onPressed: () {
+            setState(() {
+              doneTasksBox.clear();
+              doneTasks.clear();
+              _refreshTasks();
+            });
+          },)
+        ],
       ),
 
       body: Padding(
@@ -102,12 +109,11 @@ class DoneTasksPageState extends State<DoneTasksPage> {
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.w500,
-                        color: Colors.black,
                       ),
                     ),
                     Text(
                       "Completed tasks will appear here",
-                      style: TextStyle(color: Colors.grey, fontSize: 20),
+                      style: TextStyle(fontSize: 20),
                     ),
                   ],
                 ),

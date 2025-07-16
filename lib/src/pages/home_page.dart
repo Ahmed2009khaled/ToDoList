@@ -15,8 +15,11 @@ class HomePageState extends State<HomePage> {
   final Box tasksBox = Hive.box('tasks');
   List<Map<String, dynamic>> tasks = [];
 
+  final Box settings = Hive.box('settings');
+
   @override
   void initState() {
+
     super.initState();
     _refreshTasks();
   }
@@ -28,27 +31,39 @@ class HomePageState extends State<HomePage> {
       return Map<String, dynamic>.from(item as Map);
     }).toList();
 
-    refreshedTasks.sort((a, b) {
-      final dateA = a['date'] as String? ?? '';
-      final dateB = b['date'] as String? ?? '';
+  refreshedTasks.sort((a, b) {
+    final dateA = a['date'] as String? ?? '';
+    final dateB = b['date'] as String? ?? '';
+    final timeA = a['time'] as String? ?? '';
+    final timeB = b['time'] as String? ?? '';
 
-      // 1. ضع المهام بدون تاريخ في النهاية
-      if (dateA.isEmpty && dateB.isNotEmpty) return 1;
-      if (dateA.isNotEmpty && dateB.isEmpty) return -1;
+    // 1. المهام بدون تاريخ تكون في النهاية
+    if (dateA.isEmpty && dateB.isNotEmpty) return 1;
+    if (dateA.isNotEmpty && dateB.isEmpty) return -1;
 
-      // 2. إذا كانت التواريخ مختلفة (وكلاهما موجود)، قم بالترتيب حسب التاريخ
-      if (dateA.isNotEmpty && dateB.isNotEmpty) {
-        final dateComparison = dateA.compareTo(dateB);
-        if (dateComparison != 0) {
-          return dateComparison;
-        }
+    // 2. إذا كانت التواريخ مختلفة، رتب حسب التاريخ
+    if (dateA.isNotEmpty && dateB.isNotEmpty) {
+      final dateComparison = dateA.compareTo(dateB);
+      if (dateComparison != 0) {
+        return dateComparison;
       }
+      
+      // 3. إذا كانت التواريخ متساوية، رتب حسب الوقت
+      // المهمة بدون وقت تأتي بعد المهمة التي لها وقت في نفس اليوم
+      if (timeA.isEmpty && timeB.isNotEmpty) return 1;
+      if (timeA.isNotEmpty && timeB.isEmpty) return -1;
+      
+      final timeComparison = timeA.compareTo(timeB);
+      if (timeComparison != 0) {
+        return timeComparison;
+      }
+    }
 
-      // 3. إذا كانت التواريخ متساوية (أو كلاهما فارغ)، استخدم وقت الإنشاء كمعيار ثانوي
-      final createdAtA = a['createdAt'] as String? ?? '';
-      final createdAtB = b['createdAt'] as String? ?? '';
-      return createdAtA.compareTo(createdAtB); // يضمن ترتيبًا ثابتًا
-    });
+    // 4. كحل أخير، رتب حسب وقت الإنشاء
+    final createdAtA = a['createdAt'] as String? ?? '';
+    final createdAtB = b['createdAt'] as String? ?? '';
+    return createdAtA.compareTo(createdAtB);
+  });
 
     setState(() {
       tasks = refreshedTasks;
@@ -59,9 +74,7 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
         title: const Text(
           'My Tasks ',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -70,10 +83,20 @@ class HomePageState extends State<HomePage> {
 
         leading: IconButton(
           onPressed: () {
-            Navigator.of(context).pushReplacementNamed('done_tasks');
+            Navigator.of(context).pushReplacementNamed('/done_tasks');
           },
           icon: Icon(Icons.task_alt_sharp),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed('/settings');
+            },
+            icon: Icon(
+              Icons.settings,
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(2.0),
@@ -87,6 +110,7 @@ class HomePageState extends State<HomePage> {
                     name: task['name'],
                     description: task['descr'],
                     date: task['date'],
+                    time: task['time'],
                     onTap: () {
                       Navigator.of(context)
                           .push(
@@ -115,12 +139,11 @@ class HomePageState extends State<HomePage> {
                       style: TextStyle(
                         fontSize: 35,
                         fontWeight: FontWeight.w500,
-                        color: Colors.black,
                       ),
                     ),
                     Text(
                       "Tap the + Button to add new tasks",
-                      style: TextStyle(color: Colors.grey, fontSize: 20),
+                      style: TextStyle(fontSize: 20),
                     ),
                   ],
                 ),
@@ -130,12 +153,11 @@ class HomePageState extends State<HomePage> {
         onPressed: () {
           Navigator.of(
             context,
-          ).pushNamed('add_task').then((_) => _refreshTasks());
+          ).pushNamed('/add_task').then((_) => _refreshTasks());
         },
         elevation: 5,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        backgroundColor: Colors.blue,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.add),
       ),
     );
   }
